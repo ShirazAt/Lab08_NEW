@@ -4,28 +4,30 @@ orbs:
 executors:
   android-executor:
     docker:
-      - image: cimg/android:2024.09
+      - image: cimg/android:2024.09  # Using Android-specific image for better compatibility
     environment:
       JVM_OPTS: -Xmx3200m
-      ANDROID_HOME: /opt/android/sdk  # Ensure the correct SDK path
-      PATH: /opt/android/sdk/platform-tools:/opt/android/sdk/tools:$PATH  # Add sdk tools to PATH
+      ANDROID_HOME: /opt/android-sdk  # Ensure the Android SDK is available
+      PATH: /opt/android-sdk/platform-tools:/opt/android-sdk/tools:$PATH  # Add SDK tools to path
 
 jobs:
   build:
     docker:
-      - image: openjdk:17-jdk  # Use official OpenJDK 17 image
+      - image: circleci/openjdk:17-jdk  # Using OpenJDK 17 for compatibility with Android Gradle Plugin
     working_directory: ~/AndroidStudioProjects/Lab08_NEW
     steps:
       - checkout
       - run:
           name: Grant execute permission to gradlew
-          command: chmod +x gradlew
+          command: |
+            chmod +x gradlew  # Make sure the gradlew script is executable
+            ls -alh gradlew  # Verify permissions
       - restore_cache:
           keys:
             - gradle-cache-{{ checksum "build.gradle.kts" }}
       - run:
           name: Build and Test
-          command: ./gradlew build
+          command: ./gradlew build  # Build the project
       - save_cache:
           paths:
             - ~/.gradle/caches
@@ -41,10 +43,12 @@ jobs:
             - v1-gradle-cache-{{ checksum "build.gradle.kts" }}-{{ checksum "app/build.gradle.kts" }}
       - run:
           name: Grant execute permission to gradlew
-          command: chmod +x gradlew
+          command: |
+            chmod +x gradlew  # Ensure gradlew is executable
+            ls -alh gradlew  # Verify permissions
       - run:
           name: Run Unit Tests
-          command: ./gradlew testDebugUnitTest
+          command: ./gradlew testDebugUnitTest  # Run unit tests
       - save_cache:
           paths:
             - ~/.gradle/caches
