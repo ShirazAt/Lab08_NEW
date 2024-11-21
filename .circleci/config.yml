@@ -11,7 +11,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:11-jdk
-    working_directory: ~/project/Lab08
+    working_directory: ~/AndroidStudioProjects/Lab08_NEW
     steps:
       - checkout
       - run:
